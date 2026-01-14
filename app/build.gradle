@@ -63,7 +63,7 @@ dependencies {
     implementation 'androidx.fragment:fragment-ktx:1.6.2'
 
     // uCrop (fork maintenu, disponible sur Maven Central)
-    implementation 'com.github.yalantis:ucrop:2.2.8-native'
+    implementation 'com.github.yalantis:uCrop:2.2.6'
 
     // ML Kit - Text Recognition (version existante)
     implementation 'com.google.mlkit:text-recognition:16.0.0'
