@@ -19,6 +19,7 @@ import java.io.InputStream
 import android.widget.Button
 import android.widget.TextView
 import android.widget.ImageView
+import android.content.Intent
 
 class ImageEditorActivity : AppCompatActivity() {
     private val vm: MainViewModel by viewModels()
@@ -37,24 +38,25 @@ class ImageEditorActivity : AppCompatActivity() {
             sourceUri?.let { uri ->
                 CoroutineScope(Dispatchers.IO).launch {
                     val bmp = loadBitmap(uri)
-                    val pdfPath = PdfUtil.saveBitmapAsPdf(this@ImageEditorActivity, bmp, "scan_${System.currentTimeMillis()}.pdf")
-                    runOnUiThread {
-                        vm.pdfPath.value = pdfPath
-                    }
+                    val pdfPath = PdfUtil.saveBitmapAsPdf(
+                            this@ImageEditorActivity,
+                            bmp,
+                            "scan_${System.currentTimeMillis()}.pdf"
+                    )
+                    runOnUiThread { vm.pdfPath.value = pdfPath }
                 }
             }
         }
 
-        // Crop using uCrop
         findViewById<Button>(R.id.btn_crop).setOnClickListener {
             sourceUri?.let { uri ->
-                val destUri = Uri.fromFile(java.io.File(cacheDir, "cropped_${System.currentTimeMillis()}.jpg"))
-                val uCrop = com.yalantis.ucrop.UCrop.of(uri, destUri)
-                uCrop.start(this@ImageEditorActivity)
+                val destUri = Uri.fromFile(
+                        java.io.File(cacheDir, "cropped_${System.currentTimeMillis()}.jpg")
+                )
+                com.yalantis.ucrop.UCrop.of(uri, destUri).start(this)
             }
         }
 
-        // Black & white
         findViewById<Button>(R.id.btn_bw).setOnClickListener {
             sourceUri?.let { uri ->
                 CoroutineScope(Dispatchers.IO).launch {
@@ -68,7 +70,6 @@ class ImageEditorActivity : AppCompatActivity() {
             }
         }
 
-        // Contrast +/-
         var contrast = 1.0f
         findViewById<Button>(R.id.btn_contrast_inc).setOnClickListener {
             sourceUri?.let { uri ->
@@ -83,6 +84,7 @@ class ImageEditorActivity : AppCompatActivity() {
                 }
             }
         }
+
         findViewById<Button>(R.id.btn_contrast_dec).setOnClickListener {
             sourceUri?.let { uri ->
                 contrast = (contrast - 0.2f).coerceAtLeast(0.2f)
@@ -97,14 +99,12 @@ class ImageEditorActivity : AppCompatActivity() {
             }
         }
 
-        // OCR with reward gating: if not premium, ask to watch rewarded ad
         findViewById<Button>(R.id.btn_ocr).setOnClickListener {
             val prefs = getSharedPreferences("scanner_prefs", MODE_PRIVATE)
             val isPremium = prefs.getBoolean("is_premium", false)
+
             if (!isPremium) {
-                // show rewarded ad
                 MyApp.adManager.showRewarded(this) {
-                    // granted
                     prefs.edit().putBoolean("is_premium", true).apply()
                     doOcr(sourceUri)
                 }
@@ -113,12 +113,10 @@ class ImageEditorActivity : AppCompatActivity() {
             }
         }
 
-        // Share PDF / Text
         findViewById<Button>(R.id.btn_share_pdf).setOnClickListener {
-            vm.pdfPath.value?.let { path ->
-                shareFile(path)
-            }
+            vm.pdfPath.value?.let { shareFile(it) }
         }
+
         findViewById<Button>(R.id.btn_share_text).setOnClickListener {
             vm.ocrText.value?.let { text ->
                 val share = Intent(Intent.ACTION_SEND)
@@ -145,7 +143,7 @@ class ImageEditorActivity : AppCompatActivity() {
         uri?.let { u ->
             CoroutineScope(Dispatchers.IO).launch {
                 val bmp = loadBitmap(u)
-                val text = OcrUtil.recognizeText(this@ImageEditorActivity, bmp)
+                val text = OcrUtil.recognizeText(bmp)
                 runOnUiThread {
                     findViewById<TextView>(R.id.txt_ocr_result).text = text
                     vm.ocrText.value = text
@@ -157,7 +155,11 @@ class ImageEditorActivity : AppCompatActivity() {
     private fun shareFile(path: String) {
         val file = java.io.File(path)
         if (!file.exists()) return
-        val uri = androidx.core.content.FileProvider.getUriForFile(this, "${packageName}.fileprovider", file)
+        val uri = androidx.core.content.FileProvider.getUriForFile(
+                this,
+                "${packageName}.fileprovider",
+                file
+        )
         val share = Intent(Intent.ACTION_SEND)
         share.type = "application/pdf"
         share.putExtra(Intent.EXTRA_STREAM, uri)
@@ -167,14 +169,11 @@ class ImageEditorActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        // uCrop result handling
-        if (data != null) {
-            val resultUri = com.yalantis.ucrop.UCrop.getOutput(data)
-            if (resultUri != null) {
-                sourceUri = resultUri
-                val bmp = loadBitmap(resultUri)
-                findViewById<ImageView>(R.id.img_preview).setImageBitmap(bmp)
-            }
+        val resultUri = com.yalantis.ucrop.UCrop.getOutput(data ?: return)
+        resultUri?.let {
+            sourceUri = it
+            val bmp = loadBitmap(it)
+            findViewById<ImageView>(R.id.img_preview).setImageBitmap(bmp)
         }
     }
 }

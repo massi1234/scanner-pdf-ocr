@@ -20,13 +20,15 @@ import com.example.scannerpdfocr.R
 import java.text.SimpleDateFormat
 import java.util.*
 import android.net.Uri
+import com.google.common.util.concurrent.ListenableFuture
 
 class CameraActivity : AppCompatActivity() {
     private var imageCapture: ImageCapture? = null
 
-    private val requestPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-        if (granted) startCamera()
-        else finish()
+    private val requestPermission = registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) startCamera() else finish()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,9 +42,12 @@ class CameraActivity : AppCompatActivity() {
     }
 
     private fun startCamera() {
-        val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
+        val cameraProviderFuture: ListenableFuture<ProcessCameraProvider> =
+                ProcessCameraProvider.getInstance(this)
+
         cameraProviderFuture.addListener({
             val cameraProvider = cameraProviderFuture.get()
+
             val preview = Preview.Builder().build().also {
                 val pv = findViewById<PreviewView>(R.id.viewFinder)
                 it.setSurfaceProvider(pv.surfaceProvider)
@@ -52,7 +57,12 @@ class CameraActivity : AppCompatActivity() {
 
             try {
                 cameraProvider.unbindAll()
-                cameraProvider.bindToLifecycle(this, CameraSelector.DEFAULT_BACK_CAMERA, preview, imageCapture)
+                cameraProvider.bindToLifecycle(
+                        this,
+                        CameraSelector.DEFAULT_BACK_CAMERA,
+                        preview,
+                        imageCapture
+                )
             } catch (ex: Exception) {
                 ex.printStackTrace()
             }
@@ -63,7 +73,7 @@ class CameraActivity : AppCompatActivity() {
         val imageCapture = imageCapture ?: return
 
         val name = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", Locale.US)
-            .format(System.currentTimeMillis())
+                .format(System.currentTimeMillis())
 
         val contentValues = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, "scan_$name")
@@ -73,28 +83,31 @@ class CameraActivity : AppCompatActivity() {
             }
         }
 
-        val outputOptions = ImageCapture.OutputFileOptions
-            .Builder(contentResolver,
+        val outputOptions = ImageCapture.OutputFileOptions.Builder(
+                contentResolver,
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                contentValues)
-            .build()
+                contentValues
+        ).build()
 
-        imageCapture.takePicture(outputOptions, ContextCompat.getMainExecutor(this),
-            object : ImageCapture.OnImageSavedCallback {
-                override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                    val savedUri: Uri? = outputFileResults.savedUri
-                    savedUri?.let {
-                        val i = Intent().apply {
-                            putExtra("image_uri", it.toString())
+        imageCapture.takePicture(
+                outputOptions,
+                ContextCompat.getMainExecutor(this),
+                object : ImageCapture.OnImageSavedCallback {
+                    override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+                        val savedUri: Uri? = outputFileResults.savedUri
+                        savedUri?.let {
+                            val i = Intent().apply {
+                                putExtra("image_uri", it.toString())
+                            }
+                            setResult(RESULT_OK, i)
+                            finish()
                         }
-                        setResult(RESULT_OK, i)
-                        finish()
+                    }
+
+                    override fun onError(exception: ImageCaptureException) {
+                        exception.printStackTrace()
                     }
                 }
-
-                override fun onError(exception: ImageCaptureException) {
-                    exception.printStackTrace()
-                }
-            })
+        )
     }
 }
