@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="2340">
+  <rect width="100%" height="100%" fill="#FAFAFB"/>
+  <rect x="0" y="0" width="1080" height="160" fill="#6750A4"/>
+  <text x="540" y="100" font-size="48" fill="#FFFFFF" text-anchor="middle" font-family="Inter, Roboto, sans-serif">ScannerPDF OCR</text>
+
+  <!-- Main buttons -->
+  <rect x="90" y="260" rx="24" ry="24" width="900" height="160" fill="#FFFFFF" stroke="#E6E0F8" />
+  <text x="540" y="360" font-size="36" fill="#1C1B1F" text-anchor="middle">Prendre une photo</text>
+
+  <rect x="90" y="460" rx="24" ry="24" width="900" height="160" fill="#FFFFFF" stroke="#E6E0F8" />
+  <text x="540" y="560" font-size="36" fill="#1C1B1F" text-anchor="middle">Importer depuis la galerie</text>
+
+  <rect x="90" y="660" rx="24" ry="24" width="900" height="160" fill="#FFFFFF" stroke="#E6E0F8" />
+  <text x="540" y="760" font-size="36" fill="#1C1B1F" text-anchor="middle">Éditer / OCR / Export</text>
+
+  <!-- Small features -->
+  <g transform="translate(90,900)">
+    <rect width="420" height="120" rx="12" fill="#FFFFFF" stroke="#E6E0F8"/>
+    <text x="210" y="78" font-size="20" text-anchor="middle">Mes Scans</text>
+
+    <rect x="480" width="420" height="120" rx="12" fill="#FFFFFF" stroke="#E6E0F8"/>
+    <text x="690" y="78" font-size="20" text-anchor="middle">Paramètres</text>
+  </g>
+
+  <!-- Ad banner -->
+  <rect x="0" y="2160" width="1080" height="180" fill="#E0E0E0"/>
+  <text x="540" y="2245" font-size="28" fill="#444444" text-anchor="middle">[Bannière AdMob - test]</text>
+
+  <!-- Footer note -->
+  <text x="540" y="2300" font-size="18" fill="#888888" text-anchor="middle">Mock UI — fonctionnalités : CameraX, ML Kit OCR, PDF</text>
+</svg>

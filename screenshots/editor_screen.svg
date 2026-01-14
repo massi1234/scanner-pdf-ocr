@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="2340">
+  <rect width="100%" height="100%" fill="#FAFAFB"/>
+  <rect x="0" y="0" width="1080" height="140" fill="#6750A4"/>
+  <text x="540" y="96" font-size="40" fill="#FFFFFF" text-anchor="middle">Éditeur - Scan #001</text>
+
+  <!-- Image preview -->
+  <rect x="60" y="180" width="960" height="640" rx="12" fill="#FFFFFF" stroke="#E6E0F8" />
+  <text x="540" y="500" font-size="24" fill="#444444" text-anchor="middle">Aperçu de l'image (recadrer / contraste / N/B)</text>
+
+  <!-- Controls row 1 -->
+  <g transform="translate(60,860)">
+    <rect width="300" height="120" rx="12" fill="#FFFFFF" stroke="#E6E0F8"/>
+    <text x="150" y="78" font-size="20" text-anchor="middle">Recadrer</text>
+
+    <rect x="340" width="300" height="120" rx="12" fill="#FFFFFF" stroke="#E6E0F8"/>
+    <text x="490" y="78" font-size="20" text-anchor="middle">N/B</text>
+
+    <rect x="680" width="300" height="120" rx="12" fill="#FFFFFF" stroke="#E6E0F8"/>
+    <text x="830" y="78" font-size="20" text-anchor="middle">Contrast + / -</text>
+  </g>
+
+  <!-- Controls row 2 -->
+  <g transform="translate(60,1020)">
+    <rect width="540" height="120" rx="12" fill="#6750A4"/>
+    <text x="270" y="78" font-size="22" fill="#FFFFFF" text-anchor="middle">OCR (récompensé si non premium)</text>
+
+    <rect x="620" width="320" height="120" rx="12" fill="#00A859"/>
+    <text x="780" y="78" font-size="22" fill="#FFFFFF" text-anchor="middle">Générer PDF</text>
+  </g>
+
+  <!-- OCR result -->
+  <rect x="60" y="1200" width="960" height="720" rx="12" fill="#FFFFFF" stroke="#E6E0F8"/>
+  <text x="540" y="1280" font-size="20" fill="#666666" text-anchor="middle">Résultat OCR affiché ici (sélection/copie/partage)</text>
+
+  <!-- Share buttons -->
+  <rect x="60" y="2000" width="480" height="120" rx="12" fill="#FFFFFF"/>
+  <text x="300" y="2070" font-size="20" text-anchor="middle">Partager PDF</text>
+
+  <rect x="600" y="2000" width="420" height="120" rx="12" fill="#FFFFFF"/>
+  <text x="810" y="2070" font-size="20" text-anchor="middle">Partager Texte</text>
+
+  <!-- Ad banner -->
+  <rect x="0" y="2160" width="1080" height="180" fill="#E0E0E0"/>
+  <text x="540" y="2245" font-size="20" fill="#444444" text-anchor="middle">[Bannière AdMob - test]</text>
+</svg>
