@@ -204,11 +204,13 @@ class ImageEditorActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        val resultUri = com.yalantis.ucrop.UCrop.getOutput(data ?: return)
-        resultUri?.let {
-            sourceUri = it
-            val bmp = loadBitmap(it)
-            findViewById<ImageView>(R.id.img_preview).setImageBitmap(bmp)
+        if (requestCode == com.yalantis.ucrop.UCrop.REQUEST_CROP && resultCode == RESULT_OK) {
+            val resultUri = com.yalantis.ucrop.UCrop.getOutput(data ?: return)
+            resultUri?.let {
+                sourceUri = it
+                val bmp = loadBitmap(it)
+                findViewById<ImageView>(R.id.img_preview).setImageBitmap(bmp)
+            }
         }
     }
 }

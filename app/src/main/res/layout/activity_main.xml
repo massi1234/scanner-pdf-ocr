@@ -33,6 +33,23 @@
             android:text="Éditer / OCR / Export"
             android:backgroundTint="@color/md_theme_secondary"
             android:textColor="@color/md_theme_onPrimary" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_scan_document"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Scanner Document"
+            android:backgroundTint="@color/md_theme_primary"
+            android:textColor="@color/md_theme_onPrimary" />
+
+        <ImageView
+            android:id="@+id/img_preview_main"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="16dp"
+            android:scaleType="fitCenter"
+            android:visibility="gone"
+            android:contentDescription="Aperçu de l'image" />
     </LinearLayout>
 
     <com.google.android.gms.ads.AdView
