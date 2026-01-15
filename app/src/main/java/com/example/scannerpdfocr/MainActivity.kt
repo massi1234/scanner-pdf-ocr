@@ -16,7 +16,7 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.AdView
 import com.bumptech.glide.Glide
-
+import androidx.activity.viewModels
 class MainActivity : AppCompatActivity() {
 
     private val vm: MainViewModel by viewModels()
