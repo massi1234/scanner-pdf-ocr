@@ -37,7 +37,12 @@ class ScannerActivity : AppCompatActivity() {
     private val requestPermission = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
-        if (granted) startCamera() else finish()
+        if (granted) {
+            Toast.makeText(this, "Permission caméra accordée", Toast.LENGTH_SHORT).show()
+            startCamera()
+        } else {
+            showError("Permission caméra refusée. Accordez-la dans les paramètres.")
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,7 +61,16 @@ class ScannerActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btn_share).setOnClickListener { shareScan() }
         findViewById<Button>(R.id.btn_add).setOnClickListener { addAnother() }
     }
-
+    private fun showError(message: String) {
+        findViewById<TextView>(R.id.tv_error).text = message
+        findViewById<TextView>(R.id.tv_error).visibility = View.VISIBLE
+        findViewById<Button>(R.id.btn_back).visibility = View.VISIBLE
+        // Hide other elements
+        findViewById<PreviewView>(R.id.preview_view).visibility = View.GONE
+        findViewById<Button>(R.id.btn_capture).visibility = View.GONE
+        findViewById<ImageView>(R.id.img_scanned).visibility = View.GONE
+        findViewById<LinearLayout>(R.id.tools_layout).visibility = View.GONE
+    }
     private fun startCamera() {
         val cameraProviderFuture: ListenableFuture<ProcessCameraProvider> =
             ProcessCameraProvider.getInstance(this)
@@ -74,13 +88,15 @@ class ScannerActivity : AppCompatActivity() {
             try {
                 cameraProvider.unbindAll()
                 cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture)
+                Toast.makeText(this, "Caméra démarrée", Toast.LENGTH_SHORT).show()
             } catch (exc: Exception) {
-                exc.printStackTrace()
+                showError("Erreur caméra: ${exc.message}")
             }
         }, ContextCompat.getMainExecutor(this))
     }
 
     private fun takePhoto() {
+        Toast.makeText(this, "Capture en cours...", Toast.LENGTH_SHORT).show()
         val contentValues = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, "scan_${System.currentTimeMillis()}")
             put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
@@ -102,13 +118,22 @@ class ScannerActivity : AppCompatActivity() {
                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
                     val savedUri: Uri? = outputFileResults.savedUri
                     savedUri?.let {
-                        currentBitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(it))
-                        showScannedImage()
-                    }
+                        try {
+                            currentBitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(it))
+                            if (currentBitmap != null) {
+                                Toast.makeText(this@ScannerActivity, "Image capturée", Toast.LENGTH_SHORT).show()
+                                showScannedImage()
+                            } else {
+                                showError("Erreur chargement image")
+                            }
+                        } catch (e: Exception) {
+                            showError("Erreur: ${e.message}")
+                        }
+                    } ?: Toast.makeText(this@ScannerActivity, "URI sauvegarde null", Toast.LENGTH_SHORT).show()
                 }
 
                 override fun onError(exception: ImageCaptureException) {
-                    exception.printStackTrace()
+                    showError("Erreur capture: ${exception.message}")
                 }
             }
         )
@@ -120,6 +145,7 @@ class ScannerActivity : AppCompatActivity() {
         findViewById<ImageView>(R.id.img_scanned).visibility = View.VISIBLE
         findViewById<LinearLayout>(R.id.tools_layout).visibility = View.VISIBLE
         findViewById<ImageView>(R.id.img_scanned).setImageBitmap(currentBitmap)
+        Toast.makeText(this, "Mode édition activé", Toast.LENGTH_SHORT).show()
     }
 
     private fun rotateImage() {

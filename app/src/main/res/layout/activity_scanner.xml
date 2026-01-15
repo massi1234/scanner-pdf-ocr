@@ -120,4 +120,24 @@
         </LinearLayout>
     </LinearLayout>
 
+    <!-- Error Message -->
+    <TextView
+        android:id="@+id/tv_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="Erreur"
+        android:textSize="18sp"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/btn_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_error"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:text="Retour"
+        android:visibility="gone" />
+
 </RelativeLayout>
