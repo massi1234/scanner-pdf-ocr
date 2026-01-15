@@ -16,7 +16,7 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.AdView
 import com.bumptech.glide.Glide
-import androidx.activity.viewModels
+
 class MainActivity : AppCompatActivity() {
 
     private val vm: MainViewModel by viewModels()
@@ -58,13 +58,13 @@ class MainActivity : AppCompatActivity() {
             pickImage.launch("image/*")
         }
 
-        // Scanner un document = ouvrir la caméra (puis édition / OCR)
+        // Scanner un document = ouvrir la caméra
         findViewById<Button>(R.id.btn_scan_document).setOnClickListener {
             val i = Intent(this, com.example.scannerpdfocr.ui.CameraActivity::class.java)
             cameraLauncher.launch(i)
         }
 
-        // Ouvrir l’éditeur d’image (recadrage, N&B, contraste, OCR, PDF…)
+        // Ouvrir l’éditeur d’image
         findViewById<Button>(R.id.btn_edit).setOnClickListener {
             vm.sourceImageUri.value?.let {
                 val i = Intent(this, com.example.scannerpdfocr.ui.ImageEditorActivity::class.java)
