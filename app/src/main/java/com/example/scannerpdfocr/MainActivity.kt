@@ -55,9 +55,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.btn_scan_document).setOnClickListener {
-            val i = Intent(this, com.example.scannerpdfocr.ui.CameraActivity::class.java)
-            i.putExtra("mode", "scanner")
-            cameraLauncher.launch(i)
+            val i = Intent(this, com.example.scannerpdfocr.ui.ScannerActivity::class.java)
+            startActivity(i)
         }
 
         findViewById<Button>(R.id.btn_edit).setOnClickListener {

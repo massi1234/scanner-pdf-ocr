@@ -21,6 +21,7 @@
         <!-- Activities -->
         <activity android:name="com.example.scannerpdfocr.ui.ImageEditorActivity" />
         <activity android:name="com.example.scannerpdfocr.ui.CameraActivity" />
+        <activity android:name="com.example.scannerpdfocr.ui.ScannerActivity" />
 
         <activity
                 android:name="com.example.scannerpdfocr.MainActivity"

@@ -65,6 +65,9 @@ dependencies {
     // uCrop
     implementation 'com.github.yalantis:uCrop:2.2.6'
 
+    // OpenCV for document edge detection
+    implementation 'org.opencv:opencv:4.8.0'
+
     // ML Kit - Text Recognition
     implementation 'com.google.mlkit:text-recognition:16.0.0'
 
