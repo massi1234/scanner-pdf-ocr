@@ -5,23 +5,24 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
-        android:name=".MyApp"
-        android:allowBackup="true"
-        android:icon="@drawable/ic_app_icon"
-        android:label="ScannerPDF OCR"
-        android:theme="@style/Theme.ScannerPdfOcr">
+            android:name=".MyApp"
+            android:allowBackup="true"
+            android:icon="@mipmap/ic_launcher"
+            android:roundIcon="@mipmap/ic_launcher_round"
+            android:label="ScannerPDF OCR"
+            android:theme="@style/Theme.ScannerPdfOcr">
 
         <!-- AdMob App ID (test) -->
         <meta-data
-            android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713"/>
+                android:name="com.google.android.gms.ads.APPLICATION_ID"
+                android:value="ca-app-pub-3940256099942544~3347511713"/>
 
         <activity android:name="com.example.scannerpdfocr.ui.ImageEditorActivity" />
         <activity android:name="com.example.scannerpdfocr.ui.CameraActivity" />
 
         <activity
-            android:name="com.example.scannerpdfocr.MainActivity"
-            android:exported="true">
+                android:name="com.example.scannerpdfocr.MainActivity"
+                android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -30,13 +31,13 @@
 
         <!-- FileProvider for sharing generated PDFs -->
         <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationId}.fileprovider"
-            android:exported="false"
-            android:grantUriPermissions="true">
+                android:name="androidx.core.content.FileProvider"
+                android:authorities="${applicationId}.fileprovider"
+                android:exported="false"
+                android:grantUriPermissions="true">
             <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths" />
+                    android:name="android.support.FILE_PROVIDER_PATHS"
+                    android:resource="@xml/file_paths" />
         </provider>
 
     </application>
