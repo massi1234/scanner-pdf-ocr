@@ -36,6 +36,7 @@ class ImageEditorActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btn_generate_pdf).setOnClickListener {
             sourceUri?.let { uri ->
+                Toast.makeText(this, "Génération du PDF en cours...", Toast.LENGTH_SHORT).show()
                 CoroutineScope(Dispatchers.IO).launch {
                     val bmp = loadBitmap(uri)
                     val pdfPath = PdfUtil.saveBitmapAsPdf(
@@ -43,9 +44,12 @@ class ImageEditorActivity : AppCompatActivity() {
                             bmp,
                             "scan_${System.currentTimeMillis()}.pdf"
                     )
-                    runOnUiThread { vm.pdfPath.value = pdfPath }
+                    runOnUiThread { 
+                        vm.pdfPath.value = pdfPath
+                        Toast.makeText(this@ImageEditorActivity, "PDF généré", Toast.LENGTH_SHORT).show()
+                    }
                 }
-            }
+            } ?: Toast.makeText(this, "Aucune image chargée", Toast.LENGTH_SHORT).show()
         }
 
         findViewById<Button>(R.id.btn_crop).setOnClickListener {
@@ -54,11 +58,13 @@ class ImageEditorActivity : AppCompatActivity() {
                         java.io.File(cacheDir, "cropped_${System.currentTimeMillis()}.jpg")
                 )
                 com.yalantis.ucrop.UCrop.of(uri, destUri).start(this)
-            }
+                Toast.makeText(this, "Outil de recadrage ouvert", Toast.LENGTH_SHORT).show()
+            } ?: Toast.makeText(this, "Aucune image chargée", Toast.LENGTH_SHORT).show()
         }
 
         findViewById<Button>(R.id.btn_bw).setOnClickListener {
             sourceUri?.let { uri ->
+                Toast.makeText(this, "Conversion en noir et blanc...", Toast.LENGTH_SHORT).show()
                 CoroutineScope(Dispatchers.IO).launch {
                     val bmp = loadBitmap(uri)
                     val out = ImageUtils.toGrayscale(bmp)
@@ -67,13 +73,14 @@ class ImageEditorActivity : AppCompatActivity() {
                     sourceUri = Uri.fromFile(f)
                     runOnUiThread { findViewById<ImageView>(R.id.img_preview).setImageBitmap(out) }
                 }
-            }
+            } ?: Toast.makeText(this, "Aucune image chargée", Toast.LENGTH_SHORT).show()
         }
 
         var contrast = 1.0f
         findViewById<Button>(R.id.btn_contrast_inc).setOnClickListener {
             sourceUri?.let { uri ->
                 contrast += 0.2f
+                Toast.makeText(this, "Augmentation du contraste...", Toast.LENGTH_SHORT).show()
                 CoroutineScope(Dispatchers.IO).launch {
                     val bmp = loadBitmap(uri)
                     val out = ImageUtils.adjustContrast(bmp, contrast)
@@ -82,12 +89,13 @@ class ImageEditorActivity : AppCompatActivity() {
                     sourceUri = Uri.fromFile(f)
                     runOnUiThread { findViewById<ImageView>(R.id.img_preview).setImageBitmap(out) }
                 }
-            }
+            } ?: Toast.makeText(this, "Aucune image chargée", Toast.LENGTH_SHORT).show()
         }
 
         findViewById<Button>(R.id.btn_contrast_dec).setOnClickListener {
             sourceUri?.let { uri ->
                 contrast = (contrast - 0.2f).coerceAtLeast(0.2f)
+                Toast.makeText(this, "Diminution du contraste...", Toast.LENGTH_SHORT).show()
                 CoroutineScope(Dispatchers.IO).launch {
                     val bmp = loadBitmap(uri)
                     val out = ImageUtils.adjustContrast(bmp, contrast)
@@ -96,7 +104,7 @@ class ImageEditorActivity : AppCompatActivity() {
                     sourceUri = Uri.fromFile(f)
                     runOnUiThread { findViewById<ImageView>(R.id.img_preview).setImageBitmap(out) }
                 }
-            }
+            } ?: Toast.makeText(this, "Aucune image chargée", Toast.LENGTH_SHORT).show()
         }
 
         findViewById<Button>(R.id.btn_ocr).setOnClickListener {
@@ -104,11 +112,19 @@ class ImageEditorActivity : AppCompatActivity() {
             val isPremium = prefs.getBoolean("is_premium", false)
 
             if (!isPremium) {
-                MyApp.adManager.showRewarded(this) {
-                    prefs.edit().putBoolean("is_premium", true).apply()
+                if (MyApp.adManager.rewarded != null) {
+                    MyApp.adManager.showRewarded(this) {
+                        prefs.edit().putBoolean("is_premium", true).apply()
+                        Toast.makeText(this, "OCR en cours...", Toast.LENGTH_SHORT).show()
+                        doOcr(sourceUri)
+                    }
+                } else {
+                    Toast.makeText(this, "Publicité non disponible, OCR gratuit cette fois", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "OCR en cours...", Toast.LENGTH_SHORT).show()
                     doOcr(sourceUri)
                 }
             } else {
+                Toast.makeText(this, "OCR en cours...", Toast.LENGTH_SHORT).show()
                 doOcr(sourceUri)
             }
         }
@@ -123,7 +139,7 @@ class ImageEditorActivity : AppCompatActivity() {
                 share.type = "text/plain"
                 share.putExtra(Intent.EXTRA_TEXT, text)
                 startActivity(Intent.createChooser(share, "Partager le texte"))
-            }
+            } ?: Toast.makeText(this, "Effectuez l'OCR d'abord", Toast.LENGTH_SHORT).show()
         }
     }
 

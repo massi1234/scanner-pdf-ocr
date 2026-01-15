@@ -14,19 +14,25 @@
             android:id="@+id/btn_camera"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Prendre une photo" />
+            android:text="Prendre une photo"
+            android:backgroundTint="@color/md_theme_primary"
+            android:textColor="@color/md_theme_onPrimary" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_gallery"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Importer depuis la galerie" />
+            android:text="Importer depuis la galerie"
+            android:backgroundTint="@color/md_theme_primary"
+            android:textColor="@color/md_theme_onPrimary" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_edit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Éditer / OCR / Export" />
+            android:text="Éditer / OCR / Export"
+            android:backgroundTint="@color/md_theme_secondary"
+            android:textColor="@color/md_theme_onPrimary" />
     </LinearLayout>
 
     <com.google.android.gms.ads.AdView
