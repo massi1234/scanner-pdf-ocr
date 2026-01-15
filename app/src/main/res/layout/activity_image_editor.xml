@@ -26,14 +26,18 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Recadrer" />
+                android:text="Recadrer"
+                android:backgroundTint="@color/md_theme_primary"
+                android:textColor="@color/md_theme_onPrimary" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_bw"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="N/B" />
+                android:text="N/B"
+                android:backgroundTint="@color/md_theme_primary"
+                android:textColor="@color/md_theme_onPrimary" />
         </LinearLayout>
 
         <LinearLayout
@@ -47,14 +51,18 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Contrast +" />
+                android:text="Contrast +"
+                android:backgroundTint="@color/md_theme_secondary"
+                android:textColor="@color/md_theme_onSecondary" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_contrast_dec"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Contrast -" />
+                android:text="Contrast -"
+                android:backgroundTint="@color/md_theme_secondary"
+                android:textColor="@color/md_theme_onSecondary" />
         </LinearLayout>
 
         <com.google.android.material.button.MaterialButton
@@ -62,7 +70,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="OCR"
-            android:layout_marginTop="8dp" />
+            android:layout_marginTop="8dp"
+            android:backgroundTint="@color/md_theme_primary"
+            android:textColor="@color/md_theme_onPrimary" />
 
         <TextView
             android:id="@+id/txt_ocr_result"
@@ -75,7 +85,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Générer PDF"
-            android:layout_marginTop="8dp" />
+            android:layout_marginTop="8dp"
+            android:backgroundTint="@color/md_theme_secondary"
+            android:textColor="@color/md_theme_onSecondary" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -88,14 +100,18 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Partager PDF" />
+                android:text="Partager PDF"
+                android:backgroundTint="@color/md_theme_primary"
+                android:textColor="@color/md_theme_onPrimary" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_share_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Partager Texte" />
+                android:text="Partager Texte"
+                android:backgroundTint="@color/md_theme_primary"
+                android:textColor="@color/md_theme_onPrimary" />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>
