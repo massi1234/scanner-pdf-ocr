@@ -31,8 +31,8 @@ import java.io.FileOutputStream
 class ScannerActivity : AppCompatActivity() {
 
     private var imageCapture: ImageCapture? = null
-    private var currentBitmap: Bitmap? = null
-    private var rotation = 0
+    private val scannedBitmaps = mutableListOf<Bitmap>()
+    private var currentIndex = 0
 
     private val requestPermission = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -66,10 +66,11 @@ class ScannerActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.tv_error).visibility = View.VISIBLE
         findViewById<Button>(R.id.btn_back).visibility = View.VISIBLE
         // Hide other elements
-        findViewById<PreviewView>(R.id.preview_view).visibility = View.GONE
-        findViewById<Button>(R.id.btn_capture).visibility = View.GONE
-        findViewById<ImageView>(R.id.img_scanned).visibility = View.GONE
-        findViewById<LinearLayout>(R.id.tools_layout).visibility = View.GONE
+        findViewById<androidx.cardview.widget.CardView>(R.id.card_preview).visibility = View.GONE
+        findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.btn_capture).visibility = View.GONE
+        findViewById<androidx.cardview.widget.CardView>(R.id.card_image).visibility = View.GONE
+        findViewById<TextView>(R.id.tv_scan_count).visibility = View.GONE
+        findViewById<androidx.cardview.widget.CardView>(R.id.card_tools).visibility = View.GONE
     }
     private fun startCamera() {
         val cameraProviderFuture: ListenableFuture<ProcessCameraProvider> =
@@ -119,8 +120,10 @@ class ScannerActivity : AppCompatActivity() {
                     val savedUri: Uri? = outputFileResults.savedUri
                     savedUri?.let {
                         try {
-                            currentBitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(it))
-                            if (currentBitmap != null) {
+                            val bitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(it))
+                            if (bitmap != null) {
+                                scannedBitmaps.add(bitmap)
+                                currentIndex = scannedBitmaps.size - 1
                                 Toast.makeText(this@ScannerActivity, "Image capturée", Toast.LENGTH_SHORT).show()
                                 showScannedImage()
                             } else {
@@ -140,38 +143,47 @@ class ScannerActivity : AppCompatActivity() {
     }
 
     private fun showScannedImage() {
-        findViewById<PreviewView>(R.id.preview_view).visibility = View.GONE
-        findViewById<Button>(R.id.btn_capture).visibility = View.GONE
-        findViewById<ImageView>(R.id.img_scanned).visibility = View.VISIBLE
-        findViewById<LinearLayout>(R.id.tools_layout).visibility = View.VISIBLE
-        findViewById<ImageView>(R.id.img_scanned).setImageBitmap(currentBitmap)
+        findViewById<androidx.cardview.widget.CardView>(R.id.card_preview).visibility = View.GONE
+        findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.btn_capture).visibility = View.GONE
+        findViewById<androidx.cardview.widget.CardView>(R.id.card_image).visibility = View.VISIBLE
+        findViewById<TextView>(R.id.tv_scan_count).visibility = View.VISIBLE
+        findViewById<androidx.cardview.widget.CardView>(R.id.card_tools).visibility = View.VISIBLE
+        updateImageView()
+        updateScanCount()
         Toast.makeText(this, "Mode édition activé", Toast.LENGTH_SHORT).show()
     }
 
+    private fun updateImageView() {
+        if (scannedBitmaps.isNotEmpty()) {
+            findViewById<ImageView>(R.id.img_scanned).setImageBitmap(scannedBitmaps[currentIndex])
+        }
+    }
+
+    private fun updateScanCount() {
+        findViewById<TextView>(R.id.tv_scan_count).text = "Scans: ${scannedBitmaps.size}"
+    }
+
     private fun rotateImage() {
-        currentBitmap?.let {
+        if (scannedBitmaps.isNotEmpty()) {
             val matrix = Matrix()
             matrix.postRotate(90f)
-            currentBitmap = Bitmap.createBitmap(it, 0, 0, it.width, it.height, matrix, true)
-            findViewById<ImageView>(R.id.img_scanned).setImageBitmap(currentBitmap)
-            rotation = (rotation + 90) % 360
+            scannedBitmaps[currentIndex] = Bitmap.createBitmap(scannedBitmaps[currentIndex], 0, 0, scannedBitmaps[currentIndex].width, scannedBitmaps[currentIndex].height, matrix, true)
+            updateImageView()
         }
     }
 
     private fun applyFilter() {
-        currentBitmap?.let {
-            // Simple filter: increase contrast
-            currentBitmap = ImageUtils.adjustContrast(it, 1.5f)
-            findViewById<ImageView>(R.id.img_scanned).setImageBitmap(currentBitmap)
+        if (scannedBitmaps.isNotEmpty()) {
+            scannedBitmaps[currentIndex] = ImageUtils.adjustContrast(scannedBitmaps[currentIndex], 1.5f)
+            updateImageView()
         }
     }
 
     private fun cropImage() {
-        currentBitmap?.let {
-            // For simplicity, skip auto detection, use manual crop with uCrop
+        if (scannedBitmaps.isNotEmpty()) {
             val tempFile = File(cacheDir, "temp_crop.jpg")
             FileOutputStream(tempFile).use { out ->
-                it.compress(Bitmap.CompressFormat.JPEG, 100, out)
+                scannedBitmaps[currentIndex].compress(Bitmap.CompressFormat.JPEG, 100, out)
             }
             val uri = Uri.fromFile(tempFile)
             val destUri = Uri.fromFile(File(cacheDir, "cropped.jpg"))
@@ -180,16 +192,19 @@ class ScannerActivity : AppCompatActivity() {
     }
 
     private fun saveScan() {
+        if (scannedBitmaps.isEmpty()) return
         val filename = findViewById<EditText>(R.id.et_filename).text.toString()
         val isPdf = findViewById<RadioButton>(R.id.rb_pdf).isChecked
 
-        currentBitmap?.let {
-            if (isPdf) {
-                val pdfPath = PdfUtil.saveBitmapAsPdf(this, it, "$filename.pdf")
-                Toast.makeText(this, "PDF sauvegardé: $pdfPath", Toast.LENGTH_SHORT).show()
-            } else {
+        if (isPdf) {
+            val pdfPath = PdfUtil.saveBitmapsAsPdf(this, scannedBitmaps, "$filename.pdf")
+            showSaveNotification(pdfPath)
+            Toast.makeText(this, "PDF sauvegardé", Toast.LENGTH_SHORT).show()
+        } else {
+            // Save as images
+            scannedBitmaps.forEachIndexed { index, bitmap ->
                 val contentValues = ContentValues().apply {
-                    put(MediaStore.MediaColumns.DISPLAY_NAME, "$filename.jpg")
+                    put(MediaStore.MediaColumns.DISPLAY_NAME, "${filename}_$index.jpg")
                     put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
                     if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
                         put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/ScannerPdfOcr")
@@ -198,27 +213,53 @@ class ScannerActivity : AppCompatActivity() {
                 val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
                 uri?.let { u ->
                     contentResolver.openOutputStream(u)?.use { out ->
-                        it.compress(Bitmap.CompressFormat.JPEG, 100, out)
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
                     }
-                    Toast.makeText(this, "Image sauvegardée", Toast.LENGTH_SHORT).show()
                 }
             }
+            Toast.makeText(this, "Images sauvegardées", Toast.LENGTH_SHORT).show()
         }
     }
 
+    private fun showSaveNotification(path: String) {
+        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as android.app.NotificationManager
+        val channelId = "scan_channel"
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = android.app.NotificationChannel(channelId, "Scans", android.app.NotificationManager.IMPORTANCE_DEFAULT)
+            notificationManager.createNotificationChannel(channel)
+        }
+        val notification = androidx.core.app.NotificationCompat.Builder(this, channelId)
+            .setSmallIcon(android.R.drawable.ic_menu_save)
+            .setContentTitle("Scan sauvegardé")
+            .setContentText("Fichier: $path")
+            .setPriority(androidx.core.app.NotificationCompat.PRIORITY_DEFAULT)
+            .build()
+        notificationManager.notify(1, notification)
+    }
+
     private fun shareScan() {
+        if (scannedBitmaps.isEmpty()) return
         val filename = findViewById<EditText>(R.id.et_filename).text.toString()
         val isPdf = findViewById<RadioButton>(R.id.rb_pdf).isChecked
 
-        currentBitmap?.let {
-            val tempFile = File(cacheDir, if (isPdf) "$filename.pdf" else "$filename.jpg")
+        if (isPdf) {
+            val tempFile = File(cacheDir, "$filename.pdf")
+            PdfUtil.saveBitmapsAsPdf(this, scannedBitmaps, tempFile.absolutePath)
+            val uri = androidx.core.content.FileProvider.getUriForFile(
+                this,
+                "${packageName}.fileprovider",
+                tempFile
+            )
+            val share = Intent(Intent.ACTION_SEND)
+            share.type = "application/pdf"
+            share.putExtra(Intent.EXTRA_STREAM, uri)
+            share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            startActivity(Intent.createChooser(share, "Partager PDF"))
+        } else {
+            // Share first image for simplicity
+            val tempFile = File(cacheDir, "$filename.jpg")
             FileOutputStream(tempFile).use { out ->
-                if (isPdf) {
-                    // For simplicity, share as image, PDF sharing is complex
-                    it.compress(Bitmap.CompressFormat.JPEG, 100, out)
-                } else {
-                    it.compress(Bitmap.CompressFormat.JPEG, 100, out)
-                }
+                scannedBitmaps.first().compress(Bitmap.CompressFormat.JPEG, 100, out)
             }
             val uri = androidx.core.content.FileProvider.getUriForFile(
                 this,
@@ -226,21 +267,20 @@ class ScannerActivity : AppCompatActivity() {
                 tempFile
             )
             val share = Intent(Intent.ACTION_SEND)
-            share.type = if (isPdf) "application/pdf" else "image/jpeg"
+            share.type = "image/jpeg"
             share.putExtra(Intent.EXTRA_STREAM, uri)
             share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            startActivity(Intent.createChooser(share, "Partager"))
+            startActivity(Intent.createChooser(share, "Partager Image"))
         }
     }
 
     private fun addAnother() {
-        // Reset to camera view
-        findViewById<PreviewView>(R.id.preview_view).visibility = View.VISIBLE
-        findViewById<Button>(R.id.btn_capture).visibility = View.VISIBLE
-        findViewById<ImageView>(R.id.img_scanned).visibility = View.GONE
-        findViewById<LinearLayout>(R.id.tools_layout).visibility = View.GONE
-        currentBitmap = null
-        rotation = 0
+        // Go back to camera to add another scan
+        findViewById<androidx.cardview.widget.CardView>(R.id.card_preview).visibility = View.VISIBLE
+        findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.btn_capture).visibility = View.VISIBLE
+        findViewById<androidx.cardview.widget.CardView>(R.id.card_image).visibility = View.GONE
+        findViewById<TextView>(R.id.tv_scan_count).visibility = View.GONE
+        findViewById<androidx.cardview.widget.CardView>(R.id.card_tools).visibility = View.GONE
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -248,8 +288,8 @@ class ScannerActivity : AppCompatActivity() {
         if (requestCode == com.yalantis.ucrop.UCrop.REQUEST_CROP && resultCode == RESULT_OK) {
             val resultUri = com.yalantis.ucrop.UCrop.getOutput(data ?: return)
             resultUri?.let {
-                currentBitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(it))
-                findViewById<ImageView>(R.id.img_scanned).setImageBitmap(currentBitmap)
+                scannedBitmaps[currentIndex] = BitmapFactory.decodeStream(contentResolver.openInputStream(it))
+                updateImageView()
             }
         }
     }

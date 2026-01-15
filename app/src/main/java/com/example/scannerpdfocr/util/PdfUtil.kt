@@ -29,4 +29,24 @@ object PdfUtil {
         doc.close()
         return outFile.absolutePath
     }
+
+    fun saveBitmapsAsPdf(context: Context, bitmaps: List<Bitmap>, filename: String): String? {
+        val doc = PDDocument()
+        for (bitmap in bitmaps) {
+            val page = PDPage(PDRectangle(bitmap.width.toFloat(), bitmap.height.toFloat()))
+            doc.addPage(page)
+            val pdImage = LosslessFactory.createFromImage(doc, bitmap)
+            val content = PDPageContentStream(doc, page)
+            content.drawImage(pdImage, 0f, 0f, bitmap.width.toFloat(), bitmap.height.toFloat())
+            content.close()
+        }
+
+        val dir = context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS) ?: context.filesDir
+        val outFile = File(dir, filename)
+        FileOutputStream(outFile).use { fos ->
+            doc.save(fos)
+        }
+        doc.close()
+        return outFile.absolutePath
+    }
 }
