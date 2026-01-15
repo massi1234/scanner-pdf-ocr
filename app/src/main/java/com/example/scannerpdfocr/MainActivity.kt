@@ -16,19 +16,24 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.AdView
 import com.bumptech.glide.Glide
-import com.google.mlkit.vision.documentscanner.GmsDocumentScanner
-import com.google.mlkit.vision.documentscanner.GmsDocumentScannerOptions
-import com.google.mlkit.vision.documentscanner.GmsDocumentScanning
-import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
+
+// ✅ CORRECT imports for Google Play Document Scanner
+import com.google.android.gms.document.scanner.GmsDocumentScanner
+import com.google.android.gms.document.scanner.GmsDocumentScannerOptions
+import com.google.android.gms.document.scanner.GmsDocumentScanning
+import com.google.android.gms.document.scanner.GmsDocumentScanningResult
 
 class MainActivity : AppCompatActivity() {
+
     private val vm: MainViewModel by viewModels()
 
     private val pickImage = registerForActivityResult(GetContent()) { uri: Uri? ->
         uri?.let { vm.setSourceImageUri(it) }
     }
 
-    private val cameraLauncher = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()) { result ->
+    private val cameraLauncher = registerForActivityResult(
+            androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
+    ) { result ->
         if (result.resultCode == RESULT_OK) {
             val data = result.data
             val uriString = data?.getStringExtra("image_uri")
@@ -68,19 +73,21 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btn_scan_document).setOnClickListener {
             val options = GmsDocumentScannerOptions.Builder()
-                .setGalleryImportAllowed(true)
-                .setPageLimit(1)
-                .setResultFormats(GmsDocumentScannerOptions.RESULT_FORMAT_JPEG)
-                .setScannerMode(GmsDocumentScannerOptions.SCANNER_MODE_FULL)
-                .build()
+                    .setGalleryImportAllowed(true)
+                    .setPageLimit(1)
+                    .setResultFormats(GmsDocumentScannerOptions.RESULT_FORMAT_JPEG)
+                    .setScannerMode(GmsDocumentScannerOptions.SCANNER_MODE_FULL)
+                    .build()
+
             val scanner = GmsDocumentScanning.getClient(options)
+
             scanner.getStartScanIntent(this)
-                .addOnSuccessListener { intent ->
-                    scannerLauncher.launch(intent)
-                }
-                .addOnFailureListener { e ->
-                    Toast.makeText(this, "Erreur scanner: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
+                    .addOnSuccessListener { intent ->
+                        scannerLauncher.launch(intent)
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(this, "Erreur scanner: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
         }
 
         findViewById<Button>(R.id.btn_edit).setOnClickListener {
@@ -93,7 +100,6 @@ class MainActivity : AppCompatActivity() {
 
         vm.pdfPath.observe(this) { path ->
             path?.let {
-                // show interstitial after PDF creation
                 MyApp.adManager.showInterstitial(this)
             }
         }
@@ -108,7 +114,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // ensure ads are loaded (MyApp already loads on start)
         MyApp.adManager.loadInterstitial(this)
         MyApp.adManager.loadRewarded(this)
     }

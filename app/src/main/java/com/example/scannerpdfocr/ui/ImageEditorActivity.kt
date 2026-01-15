@@ -20,7 +20,7 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.ImageView
 import android.content.Intent
-import android.widget.Toast   // <-- IMPORT MANQUANT AJOUTÉ
+import android.widget.Toast
 
 class ImageEditorActivity : AppCompatActivity() {
 
@@ -120,22 +120,17 @@ class ImageEditorActivity : AppCompatActivity() {
             val isPremium = prefs.getBoolean("is_premium", false)
 
             if (!isPremium) {
-
-                // ⚠️ ACCÈS INTERDIT À rewarded → remplacé par hasRewarded()
                 if (MyApp.adManager.hasRewarded()) {
-
                     MyApp.adManager.showRewarded(this) {
                         prefs.edit().putBoolean("is_premium", true).apply()
                         Toast.makeText(this, "OCR en cours...", Toast.LENGTH_SHORT).show()
                         doOcr(sourceUri)
                     }
-
                 } else {
                     Toast.makeText(this, "Publicité non disponible, OCR gratuit cette fois", Toast.LENGTH_SHORT).show()
                     Toast.makeText(this, "OCR en cours...", Toast.LENGTH_SHORT).show()
                     doOcr(sourceUri)
                 }
-
             } else {
                 Toast.makeText(this, "OCR en cours...", Toast.LENGTH_SHORT).show()
                 doOcr(sourceUri)
