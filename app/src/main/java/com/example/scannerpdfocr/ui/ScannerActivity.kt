@@ -21,9 +21,9 @@ import com.example.scannerpdfocr.R
 import com.example.scannerpdfocr.util.ImageUtils
 import com.example.scannerpdfocr.util.PdfUtil
 import com.google.common.util.concurrent.ListenableFuture
-import org.opencv.android.OpenCVLoader
-import org.opencv.core.*
-import org.opencv.imgproc.Imgproc
+//import org.opencv.android.OpenCVLoader
+//import org.opencv.core.*
+//import org.opencv.imgproc.Imgproc
 import java.io.File
 import java.io.FileOutputStream
 
@@ -43,7 +43,7 @@ class ScannerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scanner)
 
-        OpenCVLoader.initDebug()
+//        OpenCVLoader.initDebug()
 
         requestPermission.launch(Manifest.permission.CAMERA)
 
