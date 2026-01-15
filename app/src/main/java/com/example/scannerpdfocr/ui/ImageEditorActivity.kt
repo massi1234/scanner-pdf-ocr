@@ -36,7 +36,6 @@ class ImageEditorActivity : AppCompatActivity() {
             loadImageAndProcess()
         }
 
-        // --- Génération PDF ---
         findViewById<Button>(R.id.btn_generate_pdf).setOnClickListener {
             sourceUri?.let { uri ->
                 Toast.makeText(this, "Génération du PDF en cours...", Toast.LENGTH_SHORT).show()
@@ -55,7 +54,6 @@ class ImageEditorActivity : AppCompatActivity() {
             } ?: Toast.makeText(this, "Aucune image chargée", Toast.LENGTH_SHORT).show()
         }
 
-        // --- Recadrage ---
         findViewById<Button>(R.id.btn_crop).setOnClickListener {
             sourceUri?.let { uri ->
                 val destUri = Uri.fromFile(
@@ -66,7 +64,6 @@ class ImageEditorActivity : AppCompatActivity() {
             } ?: Toast.makeText(this, "Aucune image chargée", Toast.LENGTH_SHORT).show()
         }
 
-        // --- Noir & Blanc ---
         findViewById<Button>(R.id.btn_bw).setOnClickListener {
             sourceUri?.let { uri ->
                 Toast.makeText(this, "Conversion en noir et blanc...", Toast.LENGTH_SHORT).show()
@@ -81,7 +78,6 @@ class ImageEditorActivity : AppCompatActivity() {
             } ?: Toast.makeText(this, "Aucune image chargée", Toast.LENGTH_SHORT).show()
         }
 
-        // --- Contraste ---
         var contrast = 1.0f
 
         findViewById<Button>(R.id.btn_contrast_inc).setOnClickListener {
@@ -114,7 +110,6 @@ class ImageEditorActivity : AppCompatActivity() {
             } ?: Toast.makeText(this, "Aucune image chargée", Toast.LENGTH_SHORT).show()
         }
 
-        // --- OCR ---
         findViewById<Button>(R.id.btn_ocr).setOnClickListener {
             val prefs = getSharedPreferences("scanner_prefs", MODE_PRIVATE)
             val isPremium = prefs.getBoolean("is_premium", false)
@@ -137,12 +132,10 @@ class ImageEditorActivity : AppCompatActivity() {
             }
         }
 
-        // --- Partage PDF ---
         findViewById<Button>(R.id.btn_share_pdf).setOnClickListener {
             vm.pdfPath.value?.let { shareFile(it) }
         }
 
-        // --- Partage texte OCR ---
         findViewById<Button>(R.id.btn_share_text).setOnClickListener {
             vm.ocrText.value?.let { text ->
                 val share = Intent(Intent.ACTION_SEND)

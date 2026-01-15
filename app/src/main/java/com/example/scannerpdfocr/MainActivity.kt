@@ -39,32 +39,26 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Initialize AdMob
         MobileAds.initialize(this) {}
 
-        // Banner Ad
         val adView = findViewById<AdView>(R.id.adView)
         val adRequest = AdRequest.Builder().build()
         adView.loadAd(adRequest)
 
-        // Prendre une photo (CameraX)
         findViewById<Button>(R.id.btn_camera).setOnClickListener {
             val i = Intent(this, com.example.scannerpdfocr.ui.CameraActivity::class.java)
             cameraLauncher.launch(i)
         }
 
-        // Importer depuis la galerie
         findViewById<Button>(R.id.btn_gallery).setOnClickListener {
             pickImage.launch("image/*")
         }
 
-        // Scanner un document = ouvrir la caméra
         findViewById<Button>(R.id.btn_scan_document).setOnClickListener {
             val i = Intent(this, com.example.scannerpdfocr.ui.CameraActivity::class.java)
             cameraLauncher.launch(i)
         }
 
-        // Ouvrir l’éditeur d’image
         findViewById<Button>(R.id.btn_edit).setOnClickListener {
             vm.sourceImageUri.value?.let {
                 val i = Intent(this, com.example.scannerpdfocr.ui.ImageEditorActivity::class.java)
