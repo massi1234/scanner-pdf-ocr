@@ -1,8 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Permissions -->
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
             android:name=".MyApp"
@@ -15,8 +16,9 @@
         <!-- AdMob App ID (test) -->
         <meta-data
                 android:name="com.google.android.gms.ads.APPLICATION_ID"
-                android:value="ca-app-pub-3940256099942544~3347511713"/>
+                android:value="ca-app-pub-3940256099942544~3347511713" />
 
+        <!-- Activities -->
         <activity android:name="com.example.scannerpdfocr.ui.ImageEditorActivity" />
         <activity android:name="com.example.scannerpdfocr.ui.CameraActivity" />
 
@@ -24,12 +26,12 @@
                 android:name="com.example.scannerpdfocr.MainActivity"
                 android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <!-- FileProvider for sharing generated PDFs -->
+        <!-- FileProvider for sharing PDFs and images -->
         <provider
                 android:name="androidx.core.content.FileProvider"
                 android:authorities="${applicationId}.fileprovider"

@@ -17,12 +17,6 @@ import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.AdView
 import com.bumptech.glide.Glide
 
-// ✅ CORRECT imports for Google Play Document Scanner
-import com.google.android.gms.document.scanner.GmsDocumentScanner
-import com.google.android.gms.document.scanner.GmsDocumentScannerOptions
-import com.google.android.gms.document.scanner.GmsDocumentScanning
-import com.google.android.gms.document.scanner.GmsDocumentScanningResult
-
 class MainActivity : AppCompatActivity() {
 
     private val vm: MainViewModel by viewModels()
@@ -41,15 +35,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private val scannerLauncher = registerForActivityResult(StartActivityForResult()) { result ->
-        if (result.resultCode == RESULT_OK) {
-            val data = result.data
-            val scanningResult = GmsDocumentScanningResult.fromActivityResultIntent(data)
-            val uris = scanningResult?.pages?.map { it.imageUri }
-            uris?.firstOrNull()?.let { vm.setSourceImageUri(it) }
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -62,34 +47,24 @@ class MainActivity : AppCompatActivity() {
         val adRequest = AdRequest.Builder().build()
         adView.loadAd(adRequest)
 
+        // Prendre une photo (CameraX)
         findViewById<Button>(R.id.btn_camera).setOnClickListener {
             val i = Intent(this, com.example.scannerpdfocr.ui.CameraActivity::class.java)
             cameraLauncher.launch(i)
         }
 
+        // Importer depuis la galerie
         findViewById<Button>(R.id.btn_gallery).setOnClickListener {
             pickImage.launch("image/*")
         }
 
+        // Scanner un document = ouvrir la caméra (puis édition / OCR)
         findViewById<Button>(R.id.btn_scan_document).setOnClickListener {
-            val options = GmsDocumentScannerOptions.Builder()
-                    .setGalleryImportAllowed(true)
-                    .setPageLimit(1)
-                    .setResultFormats(GmsDocumentScannerOptions.RESULT_FORMAT_JPEG)
-                    .setScannerMode(GmsDocumentScannerOptions.SCANNER_MODE_FULL)
-                    .build()
-
-            val scanner = GmsDocumentScanning.getClient(options)
-
-            scanner.getStartScanIntent(this)
-                    .addOnSuccessListener { intent ->
-                        scannerLauncher.launch(intent)
-                    }
-                    .addOnFailureListener { e ->
-                        Toast.makeText(this, "Erreur scanner: ${e.message}", Toast.LENGTH_SHORT).show()
-                    }
+            val i = Intent(this, com.example.scannerpdfocr.ui.CameraActivity::class.java)
+            cameraLauncher.launch(i)
         }
 
+        // Ouvrir l’éditeur d’image (recadrage, N&B, contraste, OCR, PDF…)
         findViewById<Button>(R.id.btn_edit).setOnClickListener {
             vm.sourceImageUri.value?.let {
                 val i = Intent(this, com.example.scannerpdfocr.ui.ImageEditorActivity::class.java)

@@ -23,6 +23,7 @@ import android.net.Uri
 import com.google.common.util.concurrent.ListenableFuture
 
 class CameraActivity : AppCompatActivity() {
+
     private var imageCapture: ImageCapture? = null
 
     private val requestPermission = registerForActivityResult(
