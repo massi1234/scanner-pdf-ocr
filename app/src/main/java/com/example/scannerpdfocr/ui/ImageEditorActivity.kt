@@ -4,8 +4,8 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.example.scannerpdfocr.R
 import com.example.scannerpdfocr.util.PdfUtil
 import com.example.scannerpdfocr.util.OcrUtil
@@ -24,7 +24,7 @@ import android.widget.Toast
 
 class ImageEditorActivity : AppCompatActivity() {
 
-    private val vm: MainViewModel by viewModels()
+    private val vm: MainViewModel by lazy { ViewModelProvider(this)[MainViewModel::class.java] }
     private var sourceUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {

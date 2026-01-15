@@ -25,6 +25,7 @@ import com.google.common.util.concurrent.ListenableFuture
 class CameraActivity : AppCompatActivity() {
 
     private var imageCapture: ImageCapture? = null
+    private var mode: String? = null
 
     private val requestPermission = registerForActivityResult(
             ActivityResultContracts.RequestPermission()
@@ -36,10 +37,26 @@ class CameraActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_camera)
 
+        mode = intent.getStringExtra("mode")
+
         requestPermission.launch(Manifest.permission.CAMERA)
 
         findViewById<Button>(R.id.btn_take_photo).setOnClickListener { takePhoto() }
         findViewById<Button>(R.id.btn_cancel).setOnClickListener { finish() }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == com.yalantis.ucrop.UCrop.REQUEST_CROP && resultCode == RESULT_OK) {
+            val resultUri = com.yalantis.ucrop.UCrop.getOutput(data ?: return)
+            resultUri?.let {
+                val i = Intent().apply {
+                    putExtra("image_uri", it.toString())
+                }
+                setResult(RESULT_OK, i)
+                finish()
+            }
+        }
     }
 
     private fun startCamera() {
@@ -97,11 +114,19 @@ class CameraActivity : AppCompatActivity() {
                     override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
                         val savedUri: Uri? = outputFileResults.savedUri
                         savedUri?.let {
-                            val i = Intent().apply {
-                                putExtra("image_uri", it.toString())
+                            if (mode == "scanner") {
+                                // Lancer uCrop pour recadrer
+                                val destUri = Uri.fromFile(
+                                        java.io.File(cacheDir, "scanned_${System.currentTimeMillis()}.jpg")
+                                )
+                                com.yalantis.ucrop.UCrop.of(it, destUri).start(this@CameraActivity)
+                            } else {
+                                val i = Intent().apply {
+                                    putExtra("image_uri", it.toString())
+                                }
+                                setResult(RESULT_OK, i)
+                                finish()
                             }
-                            setResult(RESULT_OK, i)
-                            finish()
                         }
                     }
 

@@ -9,8 +9,8 @@ import android.widget.Toast
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts.GetContent
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.example.scannerpdfocr.viewmodel.MainViewModel
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.MobileAds
@@ -19,7 +19,7 @@ import com.bumptech.glide.Glide
 
 class MainActivity : AppCompatActivity() {
 
-    private val vm: MainViewModel by viewModels()
+    private val vm: MainViewModel by lazy { ViewModelProvider(this)[MainViewModel::class.java] }
 
     private val pickImage = registerForActivityResult(GetContent()) { uri: Uri? ->
         uri?.let { vm.setSourceImageUri(it) }
@@ -56,6 +56,7 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btn_scan_document).setOnClickListener {
             val i = Intent(this, com.example.scannerpdfocr.ui.CameraActivity::class.java)
+            i.putExtra("mode", "scanner")
             cameraLauncher.launch(i)
         }
 
