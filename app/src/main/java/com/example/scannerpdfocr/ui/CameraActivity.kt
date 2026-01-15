@@ -50,9 +50,9 @@ class CameraActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == UCrop.REQUEST_CROP && resultCode == RESULT_OK) {
             val resultUri = UCrop.getOutput(data ?: return)
-            resultUri?.let {
+            resultUri?.let { uri ->
                 val i = Intent().apply {
-                    putExtra("image_uri", it.toString())
+                    putExtra("image_uri", uri.toString())
                 }
                 setResult(RESULT_OK, i)
                 finish()

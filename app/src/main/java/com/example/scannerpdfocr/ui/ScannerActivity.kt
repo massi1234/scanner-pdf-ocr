@@ -197,9 +197,14 @@ class ScannerActivity : AppCompatActivity() {
         val isPdf = findViewById<RadioButton>(R.id.rb_pdf).isChecked
 
         if (isPdf) {
-            val pdfPath = PdfUtil.saveBitmapsAsPdf(this, scannedBitmaps, "$filename.pdf")
-            showSaveNotification(pdfPath)
-            Toast.makeText(this, "PDF sauvegardé", Toast.LENGTH_SHORT).show()
+            val pdfFile = File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "$filename.pdf")
+            val pdfPath = PdfUtil.saveBitmapsAsPdf(this, scannedBitmaps, pdfFile.absolutePath)
+            if (pdfPath != null) {
+                showSaveNotification(pdfPath)
+                Toast.makeText(this, "PDF sauvegardé", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Erreur sauvegarde PDF", Toast.LENGTH_SHORT).show()
+            }
         } else {
             // Save as images
             scannedBitmaps.forEachIndexed { index, bitmap ->
@@ -287,8 +292,8 @@ class ScannerActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == UCrop.REQUEST_CROP && resultCode == RESULT_OK) {
             val resultUri = UCrop.getOutput(data ?: return)
-            resultUri?.let {
-                scannedBitmaps[currentIndex] = BitmapFactory.decodeStream(contentResolver.openInputStream(it))
+            resultUri?.let { uri ->
+                scannedBitmaps[currentIndex] = BitmapFactory.decodeStream(contentResolver.openInputStream(uri))
                 updateImageView()
             }
         }

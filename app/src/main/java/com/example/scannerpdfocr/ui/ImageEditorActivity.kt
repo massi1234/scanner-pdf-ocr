@@ -195,9 +195,9 @@ class ImageEditorActivity : AppCompatActivity() {
 
         if (requestCode == UCrop.REQUEST_CROP && resultCode == RESULT_OK) {
             val resultUri = UCrop.getOutput(data ?: return)
-            resultUri?.let {
-                sourceUri = it
-                val bmp = loadBitmap(it)
+            resultUri?.let { uri ->
+                sourceUri = uri
+                val bmp = loadBitmap(uri)
                 findViewById<ImageView>(R.id.img_preview).setImageBitmap(bmp)
             }
         }
