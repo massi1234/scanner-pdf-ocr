@@ -88,7 +88,7 @@ dependencies {
     implementation 'androidx.documentfile:documentfile:1.0.1'
 
     // UCrop for image cropping
-    implementation 'com.yalantis:ucrop:2.2.8'
+    implementation 'com.github.yalantis:ucrop:2.2.8'
 
     // Fix AdMob pulling old WorkManager / Room / SQLite
     implementation "androidx.work:work-runtime:2.9.0"
