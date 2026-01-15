@@ -22,7 +22,7 @@ import com.example.scannerpdfocr.R
 import com.example.scannerpdfocr.util.ImageUtils
 import com.example.scannerpdfocr.util.PdfUtil
 import com.google.common.util.concurrent.ListenableFuture
-//import org.opencv.android.OpenCVLoader
+import com.yalantis.ucrop.UCrop
 //import org.opencv.core.*
 //import org.opencv.imgproc.Imgproc
 import java.io.File
@@ -66,11 +66,11 @@ class ScannerActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.tv_error).visibility = View.VISIBLE
         findViewById<Button>(R.id.btn_back).visibility = View.VISIBLE
         // Hide other elements
-        findViewById<androidx.cardview.widget.CardView>(R.id.card_preview).visibility = View.GONE
-        findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.btn_capture).visibility = View.GONE
-        findViewById<androidx.cardview.widget.CardView>(R.id.card_image).visibility = View.GONE
+        findViewById<PreviewView>(R.id.preview_view).visibility = View.GONE
+        findViewById<Button>(R.id.btn_capture).visibility = View.GONE
+        findViewById<ImageView>(R.id.img_scanned).visibility = View.GONE
         findViewById<TextView>(R.id.tv_scan_count).visibility = View.GONE
-        findViewById<androidx.cardview.widget.CardView>(R.id.card_tools).visibility = View.GONE
+        findViewById<LinearLayout>(R.id.tools_layout).visibility = View.GONE
     }
     private fun startCamera() {
         val cameraProviderFuture: ListenableFuture<ProcessCameraProvider> =
@@ -143,11 +143,11 @@ class ScannerActivity : AppCompatActivity() {
     }
 
     private fun showScannedImage() {
-        findViewById<androidx.cardview.widget.CardView>(R.id.card_preview).visibility = View.GONE
-        findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.btn_capture).visibility = View.GONE
-        findViewById<androidx.cardview.widget.CardView>(R.id.card_image).visibility = View.VISIBLE
+        findViewById<PreviewView>(R.id.preview_view).visibility = View.GONE
+        findViewById<Button>(R.id.btn_capture).visibility = View.GONE
+        findViewById<ImageView>(R.id.img_scanned).visibility = View.VISIBLE
         findViewById<TextView>(R.id.tv_scan_count).visibility = View.VISIBLE
-        findViewById<androidx.cardview.widget.CardView>(R.id.card_tools).visibility = View.VISIBLE
+        findViewById<LinearLayout>(R.id.tools_layout).visibility = View.VISIBLE
         updateImageView()
         updateScanCount()
         Toast.makeText(this, "Mode édition activé", Toast.LENGTH_SHORT).show()
@@ -187,7 +187,7 @@ class ScannerActivity : AppCompatActivity() {
             }
             val uri = Uri.fromFile(tempFile)
             val destUri = Uri.fromFile(File(cacheDir, "cropped.jpg"))
-            com.yalantis.ucrop.UCrop.of(uri, destUri).start(this)
+            UCrop.of(uri, destUri).start(this)
         }
     }
 
@@ -276,17 +276,17 @@ class ScannerActivity : AppCompatActivity() {
 
     private fun addAnother() {
         // Go back to camera to add another scan
-        findViewById<androidx.cardview.widget.CardView>(R.id.card_preview).visibility = View.VISIBLE
-        findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.btn_capture).visibility = View.VISIBLE
-        findViewById<androidx.cardview.widget.CardView>(R.id.card_image).visibility = View.GONE
+        findViewById<PreviewView>(R.id.preview_view).visibility = View.VISIBLE
+        findViewById<Button>(R.id.btn_capture).visibility = View.VISIBLE
+        findViewById<ImageView>(R.id.img_scanned).visibility = View.GONE
         findViewById<TextView>(R.id.tv_scan_count).visibility = View.GONE
-        findViewById<androidx.cardview.widget.CardView>(R.id.card_tools).visibility = View.GONE
+        findViewById<LinearLayout>(R.id.tools_layout).visibility = View.GONE
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == com.yalantis.ucrop.UCrop.REQUEST_CROP && resultCode == RESULT_OK) {
-            val resultUri = com.yalantis.ucrop.UCrop.getOutput(data ?: return)
+        if (requestCode == UCrop.REQUEST_CROP && resultCode == RESULT_OK) {
+            val resultUri = UCrop.getOutput(data ?: return)
             resultUri?.let {
                 scannedBitmaps[currentIndex] = BitmapFactory.decodeStream(contentResolver.openInputStream(it))
                 updateImageView()

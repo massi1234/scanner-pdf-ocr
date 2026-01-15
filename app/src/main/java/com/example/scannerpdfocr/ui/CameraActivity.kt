@@ -21,6 +21,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import android.net.Uri
 import com.google.common.util.concurrent.ListenableFuture
+import com.yalantis.ucrop.UCrop
 
 class CameraActivity : AppCompatActivity() {
 
@@ -47,8 +48,8 @@ class CameraActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == com.yalantis.ucrop.UCrop.REQUEST_CROP && resultCode == RESULT_OK) {
-            val resultUri = com.yalantis.ucrop.UCrop.getOutput(data ?: return)
+        if (requestCode == UCrop.REQUEST_CROP && resultCode == RESULT_OK) {
+            val resultUri = UCrop.getOutput(data ?: return)
             resultUri?.let {
                 val i = Intent().apply {
                     putExtra("image_uri", it.toString())
@@ -119,7 +120,7 @@ class CameraActivity : AppCompatActivity() {
                                 val destUri = Uri.fromFile(
                                         java.io.File(cacheDir, "scanned_${System.currentTimeMillis()}.jpg")
                                 )
-                                com.yalantis.ucrop.UCrop.of(it, destUri).start(this@CameraActivity)
+                                UCrop.of(savedUri, destUri).start(this@CameraActivity)
                             } else {
                                 val i = Intent().apply {
                                     putExtra("image_uri", it.toString())

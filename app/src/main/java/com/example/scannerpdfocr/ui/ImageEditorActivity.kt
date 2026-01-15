@@ -21,6 +21,7 @@ import android.widget.TextView
 import android.widget.ImageView
 import android.content.Intent
 import android.widget.Toast
+import com.yalantis.ucrop.UCrop
 
 class ImageEditorActivity : AppCompatActivity() {
 
@@ -59,7 +60,7 @@ class ImageEditorActivity : AppCompatActivity() {
                 val destUri = Uri.fromFile(
                         java.io.File(cacheDir, "cropped_${System.currentTimeMillis()}.jpg")
                 )
-                com.yalantis.ucrop.UCrop.of(uri, destUri).start(this)
+                UCrop.of(uri, destUri).start(this)
                 Toast.makeText(this, "Outil de recadrage ouvert", Toast.LENGTH_SHORT).show()
             } ?: Toast.makeText(this, "Aucune image chargée", Toast.LENGTH_SHORT).show()
         }
@@ -192,8 +193,8 @@ class ImageEditorActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == com.yalantis.ucrop.UCrop.REQUEST_CROP && resultCode == RESULT_OK) {
-            val resultUri = com.yalantis.ucrop.UCrop.getOutput(data ?: return)
+        if (requestCode == UCrop.REQUEST_CROP && resultCode == RESULT_OK) {
+            val resultUri = UCrop.getOutput(data ?: return)
             resultUri?.let {
                 sourceUri = it
                 val bmp = loadBitmap(it)
