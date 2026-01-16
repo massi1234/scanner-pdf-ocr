@@ -104,6 +104,13 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Recadrer" />
+
+            <Button
+                android:id="@+id/btn_auto_crop"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Auto Crop" />
         </LinearLayout>
 
         <LinearLayout
